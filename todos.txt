@@ -1,0 +1,57 @@
+- hosting the data (shakespeare + other text) -- last years hosting??
+- LSTM (shakespearean data).
+- nanoGPT from scratch.
+- pretrained nanoGPT + finetuning.
+
+
+
+- LSTM on colab 6mins, #number of parameters, model architecure, memory used ??
+CharLSTM(
+  (lstm): LSTM(65, 512, num_layers=3, batch_first=True, dropout=0.5)
+  (dropout): Dropout(p=0.5, inplace=False)
+  (fc): Linear(in_features=512, out_features=65, bias=True)
+)
+number of parameters: 5421633 parameters
+
+-nanoGPT, 
+30,036,864 parameters
+nanoGPT model: 30,036,864 parameters
+NanoGPT(
+  (token_emb): Embedding(50304, 384)
+  (pos_emb): Embedding(256, 384)
+  (drop): Dropout(p=0.2, inplace=False)
+  (blocks): ModuleList(
+    (0-5): 6 x TransformerBlock(
+      (ln_1): LayerNorm((384,), eps=1e-05, elementwise_affine=True)
+      (attn): CausalSelfAttention(
+        (c_attn): Linear(in_features=384, out_features=1152, bias=False)
+        (c_proj): Linear(in_features=384, out_features=384, bias=False)
+        (attn_dropout): Dropout(p=0.2, inplace=False)
+        (resid_dropout): Dropout(p=0.2, inplace=False)
+      )
+      (ln_2): LayerNorm((384,), eps=1e-05, elementwise_affine=True)
+      (mlp): GPT_MLP(
+        (c_fc): Linear(in_features=384, out_features=1536, bias=False)
+        (gelu): GELU(approximate='none')
+        (c_proj): Linear(in_features=1536, out_features=384, bias=False)
+        (dropout): Dropout(p=0.2, inplace=False)
+      )
+    )
+  )
+  (ln_f): LayerNorm((384,), eps=1e-05, elementwise_affine=True)
+  (lm_head): Linear(in_features=384, out_features=50304, bias=False)
+)
+
+- 13.4/15GB, 
+
+forking huggingface/
+setup the data.
+
+
+--nanoGPT finetuned, 10M already some reasonable poems.
+got Best val loss: 1.4336, 1.1 char tokens.
+~ 6 mins
+5GB peak.
+issue is the dataset used already shakespearean.
+
+270M finetuning on 1M, sound good or bad.

@@ -1,6 +1,6 @@
 import os
+import pickle
 import requests
-import tiktoken
 import numpy as np
 
 # download the tiny shakespeare dataset
@@ -12,14 +12,26 @@ if not os.path.exists(input_file_path):
 
 with open(input_file_path, 'r', encoding='utf-8') as f:
     data = f.read()
-n = len(data)
-train_data = data[:int(n*0.9)]
-val_data = data[int(n*0.9):]
+print(f"length of dataset in characters: {len(data):,}")
 
-# encode with tiktoken gpt2 bpe
-enc = tiktoken.get_encoding("gpt2")
-train_ids = enc.encode_ordinary(train_data)
-val_ids = enc.encode_ordinary(val_data)
+# character-level encoding
+chars = sorted(list(set(data)))
+vocab_size = len(chars)
+print("all the unique characters:", ''.join(chars))
+print(f"vocab size: {vocab_size:,}")
+
+stoi = {ch: i for i, ch in enumerate(chars)}
+itos = {i: ch for i, ch in enumerate(chars)}
+encode = lambda s: [stoi[c] for c in s]
+decode = lambda l: ''.join([itos[i] for i in l])
+
+# train/val split
+n = len(data)
+train_data = data[:int(n * 0.9)]
+val_data = data[int(n * 0.9):]
+
+train_ids = encode(train_data)
+val_ids = encode(val_data)
 print(f"train has {len(train_ids):,} tokens")
 print(f"val has {len(val_ids):,} tokens")
 
@@ -29,5 +41,11 @@ val_ids = np.array(val_ids, dtype=np.uint16)
 train_ids.tofile(os.path.join(os.path.dirname(__file__), 'train.bin'))
 val_ids.tofile(os.path.join(os.path.dirname(__file__), 'val.bin'))
 
-# train.bin has 301,966 tokens
-# val.bin has 36,059 tokens
+# save meta information for encode/decode later
+meta = {
+    'vocab_size': vocab_size,
+    'itos': itos,
+    'stoi': stoi,
+}
+with open(os.path.join(os.path.dirname(__file__), 'meta.pkl'), 'wb') as f:
+    pickle.dump(meta, f)
